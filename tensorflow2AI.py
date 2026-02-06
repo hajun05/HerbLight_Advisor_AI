@@ -85,6 +85,23 @@ hist = model.fit(x_train, y_train, epochs=1000, validation_data=(x_val, y_val))
 # %% 예측 수행, 결과 시각화
 plant_names = ["Rosemary", "Sweet Basil", "Mint", "Lavender", "Lemon Balm"]
 
+# 그래프 시각화 함수 정의
+def plot_vision(ax0, ax1, x_train_0, x_range_0, x_val_0, x_train_1, x_range_1, x_val_1, 
+                y_train_i, y_val_i, y_predict_0_i, y_predict_1_i, plant_name):
+    # 광량 기준 예측 그래프 시각화
+    ax0.scatter(x_train_0, y_train_i, label='Train', c='green')
+    ax0.scatter(x_val_0, y_val_i, label='Validation', c='orange')
+    ax0.plot(x_range_0, y_predict_0_i, label='Prediction', c='blue')
+    ax0.set_xlabel('Light Intensity')
+    ax0.set_ylabel(f'{plant_name} DLI Satisfaction')
+
+    # 광노출시간 기준 예측 그래프 시각화
+    ax1.scatter(x_train_1, y_train_i, label='Train', c='green')
+    ax1.scatter(x_val_1, y_val_i, label='Validation', c='orange')
+    ax1.plot(x_range_1, y_predict_1_i, label='Prediction', c='blue')
+    ax1.set_xlabel('Light Exposure Time')
+    ax1.set_ylabel(f'{plant_name} DLI Satisfaction')
+
 # %% 기본 버전: 기준 이외 원인 고정 X, 역정규화 X
 fig = plt.figure(figsize=(20, 12))
 for i in range(5):
@@ -96,22 +113,10 @@ for i in range(5):
     # 예측
     y_predict = model.predict(x_test_input, verbose=0)
 
-    # 광량 기준 예측 그래프 시각화
     ax0 = plt.subplot(5, 2, i*2 + 1)
-    ax0.scatter(x_train[:, 0], y_train[:, i], label='Train', c='green')
-    ax0.scatter(x_val[:, 0], y_val[:, i], label='Validation', c='orange')
-    ax0.plot(x0_range, y_predict[:, i], label='Prediction', c='blue')
-    ax0.set_xlabel('Light Intensity')
-    ax0.set_ylabel(f'{plant_names[i]} DLI Satisfaction')
-
-    # 광노출시간 기준 예측 그래프 시각화
     ax1 = plt.subplot(5, 2, i*2 + 2)
-    ax1.scatter(x_train[:, 1], y_train[:, i], label='Train', c='green')
-    ax1.scatter(x_val[:, 1], y_val[:, i], label='Validation', c='orange')
-    ax1.plot(x1_range, y_predict[:, i], label='Prediction', c='blue')
-    ax1.set_xlabel('Light Exposure Time')
-    ax1.set_ylabel(f'{plant_names[i]} DLI Satisfaction')
-
+    plot_vision(ax0, ax1, x_train[:, 0], x0_range, x_val[:, 0], x_train[:, 1], x1_range, x_val[:, 1], 
+                y_train[:, i], y_val[:, i], y_predict[:, i], y_predict[:, i], plant_names[i])
 plt.tight_layout()
 plt.show()
 
@@ -132,26 +137,11 @@ for i in range(5):
     y_predict_0 = model.predict(x_test_input_0, verbose=0)
     y_predict_1 = model.predict(x_test_input_1, verbose=0)
     
-    # 광량 기준 예측 그래프
     ax0 = plt.subplot(5, 2, i*2 + 1)
-    ax0.scatter(x_train[:, 0], y_train[:, i], label='Train', c='green')
-    ax0.scatter(x_val[:, 0], y_val[:, i], label='Validation', c='orange')
-    ax0.plot(x0_range, y_predict_0[:, i], label='Prediction', c='blue')
-    ax0.set_xlabel('Light Intensity')
-    ax0.set_ylabel(f'{plant_names[i]} DLI Satisfaction')
-    ax0.set_title(f'Time fixed at {fixed_time:.2f}')
-    ax0.grid(True, alpha=0.3)
-    
-    # 광노출시간 기준 예측 그래프
     ax1 = plt.subplot(5, 2, i*2 + 2)
-    ax1.scatter(x_train[:, 1], y_train[:, i], label='Train', c='green')
-    ax1.scatter(x_val[:, 1], y_val[:, i], label='Validation', c='orange')
-    ax1.plot(x1_range, y_predict_1[:, i], label='Prediction', c='blue')
-    ax1.set_xlabel('Light Exposure Time')
-    ax1.set_ylabel(f'{plant_names[i]} DLI Satisfaction')
-    ax1.set_title(f'Light fixed at {fixed_light:.2f}')
-    ax1.grid(True, alpha=0.3)
-
+    plot_vision(ax0, ax1, x_train[:, 0], x0_range, x_val[:, 0], x_train[:, 1], x1_range, x_val[:, 1], 
+                y_train[:, i], y_val[:, i], y_predict_0[:, i], y_predict_1[:, i], plant_names[i])
+    
 plt.tight_layout()
 plt.show()
 
@@ -178,21 +168,10 @@ for i in range(5):
     y_train_original = y_train[:, i] * (eval(f'y_max_{i}') - eval(f'y_min_{i}')) + eval(f'y_min_{i}')
     y_val_original = y_val[:, i] * (eval(f'y_max_{i}') - eval(f'y_min_{i}')) + eval(f'y_min_{i}')
     
-    # 광량 기준 예측 그래프
     ax0 = plt.subplot(5, 2, i*2 + 1)
-    ax0.scatter(x_train_0_original, y_train_original, label='Train', c='green')
-    ax0.scatter(x_val_0_original, y_val_original, label='Validation', c='orange')
-    ax0.plot(x0_range_original, y_predict_original, label='Prediction', c='blue')
-    ax0.set_xlabel('Light Intensity (PPFD)')
-    ax0.set_ylabel(f'{plant_names[i]} DLI Satisfaction (%)')
-    
-    # 광노출시간 기준 예측 그래프
     ax1 = plt.subplot(5, 2, i*2 + 2)
-    ax1.scatter(x_train_1_original, y_train_original, label='Train', c='green')
-    ax1.scatter(x_val_1_original, y_val_original, label='Validation', c='orange')
-    ax1.plot(x1_range_original, y_predict_original, label='Prediction', c='blue')
-    ax1.set_xlabel('Light Exposure Time (h)')
-    ax1.set_ylabel(f'{plant_names[i]} DLI Satisfaction (%)')
+    plot_vision(ax0, ax1, x_train_0_original, x0_range_original, x_val_0_original, x_train_1_original, x1_range_original, x_val_1_original, 
+                y_train_original, y_val_original, y_predict_original, y_predict_original, plant_names[i])
 
 plt.tight_layout()
 plt.show()
@@ -230,25 +209,46 @@ for i in range(5):
     y_train_original = y_train[:, i] * (eval(f'y_max_{i}') - eval(f'y_min_{i}')) + eval(f'y_min_{i}')
     y_val_original = y_val[:, i] * (eval(f'y_max_{i}') - eval(f'y_min_{i}')) + eval(f'y_min_{i}')
     
-    # 광량 기준 예측 그래프
     ax0 = plt.subplot(5, 2, i*2 + 1)
-    ax0.scatter(x_train_0_original, y_train_original, label='Train', c='green')
-    ax0.scatter(x_val_0_original, y_val_original, label='Validation', c='orange')
-    ax0.plot(x0_range_original, y_predict_0_original, label='Prediction', c='blue')
-    ax0.set_xlabel('Light Intensity (PPFD)')
-    ax0.set_ylabel(f'{plant_names[i]} DLI Satisfaction (%)')
-    ax0.set_title(f'Time fixed at {fixed_time_original:.1f}h')
-    
-    # 광노출시간 기준 예측 그래프
     ax1 = plt.subplot(5, 2, i*2 + 2)
-    ax1.scatter(x_train_1_original, y_train_original, label='Train', c='green')
-    ax1.scatter(x_val_1_original, y_val_original, label='Validation', c='orange')
-    ax1.plot(x1_range_original, y_predict_1_original, label='Prediction', c='blue')
-    ax1.set_xlabel('Light Exposure Time (h)')
-    ax1.set_ylabel(f'{plant_names[i]} DLI Satisfaction (%)')
-    ax1.set_title(f'Light fixed at {fixed_light_original:.1f} PPFD')
+    plot_vision(ax0, ax1, x_train_0_original, x0_range_original, x_val_0_original, x_train_1_original, x1_range_original, x_val_1_original, 
+                y_train_original, y_val_original, y_predict_0_original, y_predict_1_original, plant_names[i])
+
+plt.tight_layout()
 
 plt.tight_layout()
 plt.show()
+
+# %% 손실 그래프 시각화
+plt.figure(figsize=(12, 5))
+
+# 학습 손실과 검증 손실
+plt.subplot(1, 2, 1)
+plt.plot(hist.history['loss'], label='Training Loss', linewidth=2)
+plt.plot(hist.history['val_loss'], label='Validation Loss', linewidth=2)
+plt.xlabel('Epoch')
+plt.ylabel('Loss (MSE)')
+plt.title('Model Training History')
+plt.legend()
+plt.grid(True, alpha=0.3)
+
+# 로그 스케일로 표시
+plt.subplot(1, 2, 2)
+plt.plot(hist.history['loss'], label='Training Loss', linewidth=2)
+plt.plot(hist.history['val_loss'], label='Validation Loss', linewidth=2)
+plt.xlabel('Epoch')
+plt.ylabel('Loss (MSE)')
+plt.title('Model Training History (Log Scale)')
+plt.yscale('log')
+plt.legend()
+plt.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+# %% 최종 손실 출력
+print(f"최종 학습 손실: {hist.history['loss'][-1]:.6f}")
+print(f"최종 검증 손실: {hist.history['val_loss'][-1]:.6f}")
+print(f"최소 검증 손실: {min(hist.history['val_loss']):.6f} (Epoch {np.argmin(hist.history['val_loss']) + 1})")
 
 # %%
