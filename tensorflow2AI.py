@@ -251,4 +251,27 @@ print(f"최종 학습 손실: {hist.history['loss'][-1]:.6f}")
 print(f"최종 검증 손실: {hist.history['val_loss'][-1]:.6f}")
 print(f"최소 검증 손실: {min(hist.history['val_loss']):.6f} (Epoch {np.argmin(hist.history['val_loss']) + 1})")
 
+# %% 모델 저장
+model.save("HerbLight_Advisor_model.keras")
+# %% 모델 불러오기, 사용하기
+loaded_model = tf.keras.models.load_model("HerbLight_Advisor_model.keras")
+loaded_model.summary()
+# %%# 기본 버전: 기준 이외 원인 고정 X, 역정규화 X
+fig = plt.figure(figsize=(20, 12))
+for i in range(5):
+    # 예측용 입력 데이터 생성(100개 샘플)
+    x0_range = np.linspace(x_train[:, 0].min(), x_train[:, 0].max(), 100)
+    x1_range = np.linspace(x_train[:, 1].min(), x_train[:, 1].max(), 100)
+    x_test_input = np.column_stack([x0_range, x1_range])  # (100, 2)
+
+    # 예측
+    y_predict = loaded_model.predict(x_test_input, verbose=0)
+
+    ax0 = plt.subplot(5, 2, i*2 + 1)
+    ax1 = plt.subplot(5, 2, i*2 + 2)
+    plot_vision(ax0, ax1, x_train[:, 0], x0_range, x_val[:, 0], x_train[:, 1], x1_range, x_val[:, 1], 
+                y_train[:, i], y_val[:, i], y_predict[:, i], y_predict[:, i], plant_names[i])
+plt.tight_layout()
+plt.show()
+
 # %%
