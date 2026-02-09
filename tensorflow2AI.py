@@ -253,10 +253,12 @@ print(f"최소 검증 손실: {min(hist.history['val_loss']):.6f} (Epoch {np.arg
 
 # %% 모델 저장
 model.save("HerbLight_Advisor_model.keras")
+
 # %% 모델 불러오기, 사용하기
 loaded_model = tf.keras.models.load_model("HerbLight_Advisor_model.keras")
 loaded_model.summary()
-# %%# 기본 버전: 기준 이외 원인 고정 X, 역정규화 X
+
+# 기본 버전 재사용
 fig = plt.figure(figsize=(20, 12))
 for i in range(5):
     # 예측용 입력 데이터 생성(100개 샘플)
