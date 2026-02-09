@@ -1,0 +1,37 @@
+{
+  "input": {
+    "light_min": 110.0,
+    "light_max": 1975.0,
+    "time_min": 2.1,
+    "time_max": 18.0
+  },
+  "output": {
+    "rosemary": {
+      "min": 7.4,
+      "max": 390.6
+    },
+    "sweet_basil": {
+      "min": 7.7,
+      "max": 405.6
+    },
+    "mint": {
+      "min": 12.5,
+      "max": 659.1
+    },
+    "lavender": {
+      "min": 8.0,
+      "max": 421.8
+    },
+    "lemon_balm": {
+      "min": 10.0,
+      "max": 527.3
+    }
+  },
+  "plant_names": [
+    "Rosemary",
+    "Sweet Basil",
+    "Mint",
+    "Lavender",
+    "Lemon Balm"
+  ]
+}

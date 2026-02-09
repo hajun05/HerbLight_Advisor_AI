@@ -276,4 +276,26 @@ for i in range(5):
 plt.tight_layout()
 plt.show()
 
+# %% C#에서 활용할 스케일링 및 메타 데이터 저장
+import json
+scaler_meta_info = {
+    "input": {
+        "light_min": float(x_min_0),
+        "light_max": float(x_max_0),
+        "time_min": float(x_min_1),
+        "time_max": float(x_max_1)
+    },
+    "output": {
+        "rosemary": {"min": float(y_min_0), "max": float(y_max_0)},
+        "sweet_basil": {"min": float(y_min_1), "max": float(y_max_1)},
+        "mint": {"min": float(y_min_2), "max": float(y_max_2)},
+        "lavender": {"min": float(y_min_3), "max": float(y_max_3)},
+        "lemon_balm": {"min": float(y_min_4), "max": float(y_max_4)}
+    },
+    "plant_names": ["Rosemary", "Sweet Basil", "Mint", "Lavender", "Lemon Balm"]
+}
+
+with open("scaler_meta_info.json", "w", encoding="utf-8") as f:
+    json.dump(scaler_meta_info, f, indent=2)
+
 # %%
