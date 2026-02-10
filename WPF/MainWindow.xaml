@@ -56,10 +56,11 @@
             <TextBox x:Name="LightTimeText" Grid.Row="2" Grid.Column="2" VerticalContentAlignment="Center" Margin="10,10,0,10"/>
         </Grid>
 
-        <Grid Grid.Row="2" Margin="20, 10">
+        <Grid Grid.Row="2" Margin="20, 0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="3*"/>
                 <RowDefinition Height="2*"/>
+                <RowDefinition Height="5*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
@@ -71,7 +72,8 @@
             <Slider x:Name="DLISlider" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="0" Maximum="200" Minimum="0"/>
             <TextBox x:Name="DLIText" Grid.Row="0" Grid.Column="2" VerticalContentAlignment="Center" Margin="10,10,0,10"/>
 
-            <TextBox x:Name="Notice" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" VerticalContentAlignment="Center" Margin="10"/>
+            <TextBox x:Name="Notice1" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" VerticalContentAlignment="Top" HorizontalAlignment="Center" BorderThickness="0" IsReadOnly="True"/>
+            <TextBox x:Name="Notice2" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" VerticalContentAlignment="Top" Margin="0,10" BorderThickness="0" IsReadOnly="True"/>
         </Grid>
 
     </Grid>
