@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -16,9 +17,109 @@ namespace HerbLight_Advisor
     /// </summary>
     public partial class MainWindow : Window
     {
+        // 프로퍼티 --------------------------------------------------------------
+
+        public int InputPpfd { get; set; }
+        public int InputTIme { get; set; }
+        public int OutputDli { get; set; }
+
         public MainWindow()
         {
             InitializeComponent();
+            PpfdText.Text = "0μmol";
+            LightTimeText.Text = "0hour";
         }
+
+        // 메소드 ----------------------------------------------------------------
+
+        // 텍스트박스에 숫자만 입력 가능하도록 제한
+        private bool IsTextNumeric(string text)
+        {
+            Regex regex = new Regex("[^0-9]+");
+            return !regex.IsMatch(text);
+        }
+
+        // 이벤트 핸들러 ----------------------------------------------------------
+
+        // 슬라이더 - 텍스트박스 값 연동
+        private void PpfdSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            PpfdSlider.Value = Convert.ToInt32(e.NewValue);
+            PpfdText.Text = PpfdSlider.Value.ToString() + "μmol";
+        }
+
+        private void LightTimeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            LightTimeSlider.Value = Convert.ToInt32(e.NewValue);
+            LightTimeText.Text = LightTimeSlider.Value.ToString() + "hour";
+        }
+
+        // 숫자만 입력되도록 제한
+        private void Text_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = !IsTextNumeric(e.Text);
+        }
+
+        // 포커스를 받을 때 단위 제거
+        private void Text_GotFocus(object sender, RoutedEventArgs e)
+        {
+            TextBox textbox = sender as TextBox;
+            if (textbox != null)
+            {
+                string onlyNum = Regex.Replace(textbox.Text, @"\D", "");
+                textbox.Text = onlyNum;
+
+                textbox.Dispatcher.BeginInvoke(new Action(() => textbox.SelectAll()), System.Windows.Threading.DispatcherPriority.Input);
+            }
+        }
+
+        // 포커스를 잃을 때 슬라이더에 값 적용하고 단위 추가
+        private void PpfdText_LostFocus(object sender, RoutedEventArgs e)
+        {
+            string text = PpfdText.Text.Replace("μmol", "").Trim();
+
+            if (int.TryParse(text, out int value))
+            {
+                value = int.Min(2000, value);
+                PpfdSlider.Value = value;
+                PpfdText.Text = value.ToString() + "μmol";
+            }
+            else
+            {
+                PpfdText.Text = Convert.ToInt32(PpfdSlider.Value).ToString() + "μmol";
+            }
+        }
+
+        private void LightTimeText_LostFocus(object sender, RoutedEventArgs e)
+        {
+            string text = LightTimeText.Text.Replace("hour", "").Trim();
+
+            if (int.TryParse(text, out int value))
+            {
+                value = int.Min(18, value);
+                LightTimeSlider.Value = value;
+                LightTimeText.Text = value.ToString() + "hour";
+            }
+            else
+            {
+                LightTimeText.Text = Convert.ToInt32(LightTimeSlider.Value).ToString() + "hour";
+            }
+        }
+
+        // 엔터키 입력시 입력 종료, 포커스 이동
+        private void TextBox_EnterKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                if (PpfdText.IsFocused)
+                    LightTimeText.Focus();
+                else if (LightTimeText.IsFocused)
+                    PpfdText.Focus();
+                
+                e.Handled = true;
+            }
+        }
+
+
     }
 }

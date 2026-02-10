@@ -6,8 +6,9 @@
         xmlns:local="clr-namespace:HerbLight_Advisor"
         mc:Ignorable="d"
         ResizeMode="NoResize"
+        FontSize="15"
         WindowStartupLocation="CenterScreen"
-        Title="MainWindow" Height="500" Width="350">
+        Title="MainWindow" Height="500" Width="350" >
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -41,19 +42,42 @@
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="6*"/>
+                <ColumnDefinition Width="5*"/>
                 <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
 
             <Label Content="Herb" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold"/>
             <ComboBox x:Name="PlantList" Grid.Row="0" Grid.Column="1" Margin="0,10,10,10"/>
-            <Button x:Name="AppplyBtn" Content="Apply" Grid.Row="0" Grid.Column="2" Margin="10,10,0,10" FontSize="15" FontWeight="SemiBold"/>
+            <Button x:Name="ApplyBtn" Content="Apply" Grid.Row="0" Grid.Column="2" Margin="10,10,0,10" FontWeight="SemiBold"/>
+            
             <Label Content="PPFD" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold"/>
-            <Slider x:Name="PpfdSlider" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="0,10,5,10" Maximum="2000" Minimum="0"/>
-            <TextBox x:Name="PpfdText" Grid.Row="1" Grid.Column="2" VerticalContentAlignment="Center" Margin="10,10,0,10"/>
+            <Grid Grid.Row="1" Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="3*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Slider x:Name="PpfdSlider" Grid.Row="0" VerticalAlignment="Bottom" 
+                        Maximum="2000" Minimum="0" 
+                        TickPlacement="BottomRight" TickFrequency="200" 
+                        ValueChanged="PpfdSlider_ValueChanged" />
+                <TextBlock Text="0" Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="8" Foreground="Gray" Margin="3.3,0"/>
+                <TextBlock Text="2000" Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Right" FontSize="8" Foreground="Gray" Margin="-3,0"/>
+            </Grid>
+            <TextBox x:Name="PpfdText" Grid.Row="1" Grid.Column="2" VerticalContentAlignment="Center" Margin="10,10,0,10" Padding="3,0" PreviewTextInput="Text_PreviewTextInput" GotFocus="Text_GotFocus" LostFocus="PpfdText_LostFocus" KeyDown="TextBox_EnterKeyDown"/>
+            
             <Label Content="Time" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold"/>
-            <Slider x:Name="LightTimeSlider" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Margin="0,10,5,10" Maximum="18" Minimum="0"/>
-            <TextBox x:Name="LightTimeText" Grid.Row="2" Grid.Column="2" VerticalContentAlignment="Center" Margin="10,10,0,10"/>
+            <Grid Grid.Row="2" Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="3*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Slider x:Name="LightTimeSlider" Grid.Row="0" VerticalAlignment="Bottom" Maximum="18" Minimum="0" TickPlacement="BottomRight" TickFrequency="2" ValueChanged="LightTimeSlider_ValueChanged"/>
+                <TextBlock Text="0" Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="8" Foreground="Gray" Margin="3.3,0"/>
+                <TextBlock Text="18" Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Right" FontSize="8" Foreground="Gray" Margin="1,0"/>
+            </Grid>
+            <TextBox x:Name="LightTimeText" Grid.Row="2" Grid.Column="2" VerticalContentAlignment="Center" Margin="10,10,0,10" PreviewTextInput="Text_PreviewTextInput" GotFocus="Text_GotFocus" LostFocus="LightTimeText_LostFocus" KeyDown="TextBox_EnterKeyDown"/>
         </Grid>
 
         <Grid Grid.Row="2" Margin="20, 0">
@@ -69,7 +93,7 @@
             </Grid.ColumnDefinitions>
 
             <Label Content="DLI" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold"/>
-            <Slider x:Name="DLISlider" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="0" Maximum="200" Minimum="0"/>
+            <Slider x:Name="DLISlider" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="0" Maximum="200" Minimum="0" IsHitTestVisible="False"/>
             <TextBox x:Name="DLIText" Grid.Row="0" Grid.Column="2" VerticalContentAlignment="Center" Margin="10,10,0,10"/>
 
             <TextBox x:Name="Notice1" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" VerticalContentAlignment="Top" HorizontalAlignment="Center" BorderThickness="0" IsReadOnly="True"/>
