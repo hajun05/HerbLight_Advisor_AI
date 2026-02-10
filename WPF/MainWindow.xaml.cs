@@ -18,18 +18,22 @@ namespace HerbLight_Advisor
     /// </summary>
     public partial class MainWindow : Window
     {
-        // 프로퍼티 --------------------------------------------------------------
-
+        // 필드, 프로퍼티 --------------------------------------------------------------
+        private OnnxProcess _onnxProcess;
         public ObservableCollection<string> HerbNames { get; set; } = new ObservableCollection<string>();
-        public int InputPpfd { get; set; }
-        public int InputTIme { get; set; }
-        public int OutputDli { get; set; }
+        public double InputPpfd { get; set; }
+        public double InputTIme { get; set; }
+        public double OutputDli { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
 
-            HerbNames.Add(" ");
+            _onnxProcess = new OnnxProcess();
+
+            HerbNames.Add("기타");
+            foreach(string name in _onnxProcess.HerbNames)
+                HerbNames.Add(name);
 
             HerbList.ItemsSource = HerbNames;
             HerbList.SelectedIndex = 0;
@@ -53,12 +57,14 @@ namespace HerbLight_Advisor
         // 슬라이더 - 텍스트박스 값 연동
         private void PpfdSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            InputPpfd = e.NewValue;
             PpfdSlider.Value = Convert.ToInt32(e.NewValue);
             PpfdText.Text = PpfdSlider.Value.ToString() + "μmol";
         }
 
         private void LightTimeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            InputTIme = e.NewValue;
             LightTimeSlider.Value = Convert.ToInt32(e.NewValue);
             LightTimeText.Text = LightTimeSlider.Value.ToString() + "hour";
         }
@@ -132,7 +138,15 @@ namespace HerbLight_Advisor
         // 출력 이벤트 핸들러 ------------------------------------------------------
         private void ApplyBtn_Click(object sender, RoutedEventArgs e)
         {
-            int resultDLI = 0;
+            float resultDLI = 0;
+            if (HerbList.SelectedIndex == 0)
+            {
+                resultDLI = _onnxProcess.PredictAverageDLI((float)InputPpfd, (float)InputTIme);
+            }
+            else
+            {
+                resultDLI = _onnxProcess.PredictDLI((float)InputPpfd, (float)InputTIme, HerbList.SelectedIndex - 1);
+            }
             DLISlider.Value = resultDLI;
             DLIText.Text = resultDLI.ToString() + "%";
 
@@ -149,7 +163,7 @@ namespace HerbLight_Advisor
                 DLIText.Background = System.Windows.Media.Brushes.OrangeRed;
 
                 Notice1.Text = "과광량";
-                Notice2.Text = "특히 고온시 잎 마름 여부를 수시로 확인하세요";
+                Notice2.Text = "강광에 잘 적응하고 있는지 수시로 확인하세요.";
             }
             else if (resultDLI > 90)
             {
@@ -174,7 +188,7 @@ namespace HerbLight_Advisor
                 Notice2.Text = "장기적인 생존이 불가능하니 즉시 밝은 환경으로 옮기세요.";
             }
 
-            if (InitBtn.Visibility == Visibility.Collapsed)
+            if (InitBtn.Visibility != Visibility.Visible)
                 InitBtn.Visibility = Visibility.Visible;
         }
 

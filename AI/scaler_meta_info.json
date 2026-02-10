@@ -6,32 +6,32 @@
     "time_max": 18.0
   },
   "output": {
-    "rosemary": {
+    "로즈마리": {
       "min": 7.4,
       "max": 390.6
     },
-    "sweet_basil": {
+    "스위트 바질": {
       "min": 7.7,
       "max": 405.6
     },
-    "mint": {
+    "민트": {
       "min": 12.5,
       "max": 659.1
     },
-    "lavender": {
+    "라벤더": {
       "min": 8.0,
       "max": 421.8
     },
-    "lemon_balm": {
+    "레몬 밤": {
       "min": 10.0,
       "max": 527.3
     }
   },
   "plant_names": [
-    "Rosemary",
-    "Sweet Basil",
-    "Mint",
-    "Lavender",
-    "Lemon Balm"
+    "로즈마리",
+    "스위트 바질",
+    "민트",
+    "라벤더",
+    "레몬 밤"
   ]
 }
