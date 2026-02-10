@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.ObjectModel;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,6 +20,7 @@ namespace HerbLight_Advisor
     {
         // 프로퍼티 --------------------------------------------------------------
 
+        public ObservableCollection<string> HerbNames { get; set; } = new ObservableCollection<string>();
         public int InputPpfd { get; set; }
         public int InputTIme { get; set; }
         public int OutputDli { get; set; }
@@ -26,8 +28,15 @@ namespace HerbLight_Advisor
         public MainWindow()
         {
             InitializeComponent();
+
+            HerbNames.Add(" ");
+
+            HerbList.ItemsSource = HerbNames;
+            HerbList.SelectedIndex = 0;
+
             PpfdText.Text = "0μmol";
             LightTimeText.Text = "0hour";
+            DLIText.Text = "0%";
         }
 
         // 메소드 ----------------------------------------------------------------
@@ -39,7 +48,7 @@ namespace HerbLight_Advisor
             return !regex.IsMatch(text);
         }
 
-        // 이벤트 핸들러 ----------------------------------------------------------
+        // 입력 이벤트 핸들러 ------------------------------------------------------
 
         // 슬라이더 - 텍스트박스 값 연동
         private void PpfdSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -120,6 +129,69 @@ namespace HerbLight_Advisor
             }
         }
 
+        // 출력 이벤트 핸들러 ------------------------------------------------------
+        private void ApplyBtn_Click(object sender, RoutedEventArgs e)
+        {
+            int resultDLI = 0;
+            DLISlider.Value = resultDLI;
+            DLIText.Text = resultDLI.ToString() + "%";
 
+            if (resultDLI > 200)
+            {
+                DLIText.Background = System.Windows.Media.Brushes.Red;
+                DLIText.Foreground = System.Windows.Media.Brushes.LightGray;
+
+                Notice1.Text = "심각한 과광량";
+                Notice2.Text = "잎 화상 위험이 높으니 즉시 차광하거나 위치를 조정하세요.";
+            }
+            else if (resultDLI > 110)
+            {
+                DLIText.Background = System.Windows.Media.Brushes.OrangeRed;
+
+                Notice1.Text = "과광량";
+                Notice2.Text = "특히 고온시 잎 마름 여부를 수시로 확인하세요";
+            }
+            else if (resultDLI > 90)
+            {
+                DLIText.Background = System.Windows.Media.Brushes.Green;
+
+                Notice1.Text = "적정광량";
+                Notice2.Text = "현재 위치가 이상적이며, 안정적인 생육이 기대됩니다.";
+            }
+            else if (resultDLI > 70)
+            {
+                DLIText.Background = System.Windows.Media.Brushes.Blue;
+
+                Notice1.Text = "저광량";
+                Notice2.Text = "웃자람이 생길 수 있으니 더 밝은 곳을 고려하세요";
+            }
+            else
+            {
+                DLIText.Background = System.Windows.Media.Brushes.Navy;
+                DLIText.Foreground = System.Windows.Media.Brushes.LightGray;
+
+                Notice1.Text = "심각한 저광량";
+                Notice2.Text = "장기적인 생존이 불가능하니 즉시 밝은 환경으로 옮기세요.";
+            }
+
+            if (InitBtn.Visibility == Visibility.Collapsed)
+                InitBtn.Visibility = Visibility.Visible;
+        }
+
+        private void InitBtn_Click(object sender, RoutedEventArgs e)
+        {
+            PpfdSlider.Value = 0;
+            LightTimeSlider.Value = 0;
+            DLISlider.Value = 0;
+            HerbList.SelectedIndex = 0;
+
+            DLIText.Background = System.Windows.Media.Brushes.Transparent;
+            DLIText.Foreground = System.Windows.Media.Brushes.Black;
+
+            Notice1.Text = "";
+            Notice1.Text = "";
+
+            InitBtn.Visibility = Visibility.Collapsed;
+        }
     }
 }
