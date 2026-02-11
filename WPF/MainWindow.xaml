@@ -34,7 +34,7 @@
             </TextBlock>
         </Grid>
 
-        <Grid Grid.Row="1" Margin="20,10">
+        <Grid Grid.Row="1" Margin="15,10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
@@ -79,7 +79,7 @@
             <TextBox x:Name="LightTimeText" Grid.Row="2" Grid.Column="2" VerticalContentAlignment="Center" Margin="10,10,0,10" PreviewTextInput="Text_PreviewTextInput" GotFocus="Text_GotFocus" LostFocus="LightTimeText_LostFocus" KeyDown="TextBox_EnterKeyDown"/>
         </Grid>
 
-        <Grid Grid.Row="2" Margin="20, 0">
+        <Grid Grid.Row="2" Margin="15, 0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="2*"/>
                 <RowDefinition Height="2*"/>

@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -19,10 +20,13 @@ namespace HerbLight_Advisor
     public partial class MainWindow : Window
     {
         // 필드, 프로퍼티 --------------------------------------------------------------
+        private const string PPFD_SUFFIX = "μmol";
+        private const string HOUR_SUFFIX = "h";
+        private const string MINUTE_SUFFIX = "m";
         private OnnxProcess _onnxProcess;
         public ObservableCollection<string> HerbNames { get; set; } = new ObservableCollection<string>();
         public double InputPpfd { get; set; }
-        public double InputTIme { get; set; }
+        public double InputLightTime { get; set; }
         public double OutputDli { get; set; }
 
         public MainWindow()
@@ -38,9 +42,9 @@ namespace HerbLight_Advisor
             HerbList.ItemsSource = HerbNames;
             HerbList.SelectedIndex = 0;
 
-            PpfdText.Text = "0μmol";
-            LightTimeText.Text = "0hour";
-            DLIText.Text = "0%";
+            PpfdText.Text = "0.0" + PPFD_SUFFIX;
+            LightTimeText.Text = "0" + HOUR_SUFFIX + " 0" + MINUTE_SUFFIX;
+            DLIText.Text = "0.0%";
         }
 
         // 메소드 ----------------------------------------------------------------
@@ -48,8 +52,27 @@ namespace HerbLight_Advisor
         // 텍스트박스에 숫자만 입력 가능하도록 제한
         private bool IsTextNumeric(string text)
         {
+            // 실수
+            if (text == "." && text.Contains("."))
+            {
+                return true;
+            }
+            // 정수
             Regex regex = new Regex("[^0-9]+");
             return !regex.IsMatch(text);
+        }
+
+        private string ConvertPpfd(double input)
+        {
+            double truncated = Math.Truncate(input * 10) / 10.0;
+            return truncated.ToString("0.0") + PPFD_SUFFIX;
+        }
+
+        private string ConvertLightTime(double input)
+        {
+            int inputHour = (int)input;
+            int inputMinute = (int)((input - inputHour) * 60);
+            return inputHour.ToString() + HOUR_SUFFIX + " " + inputMinute.ToString() + MINUTE_SUFFIX;
         }
 
         // 입력 이벤트 핸들러 ------------------------------------------------------
@@ -58,15 +81,13 @@ namespace HerbLight_Advisor
         private void PpfdSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             InputPpfd = e.NewValue;
-            PpfdSlider.Value = Convert.ToInt32(e.NewValue);
-            PpfdText.Text = PpfdSlider.Value.ToString() + "μmol";
+            PpfdText.Text = ConvertPpfd(InputPpfd);
         }
 
         private void LightTimeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            InputTIme = e.NewValue;
-            LightTimeSlider.Value = Convert.ToInt32(e.NewValue);
-            LightTimeText.Text = LightTimeSlider.Value.ToString() + "hour";
+            InputLightTime = e.NewValue;
+            LightTimeText.Text = ConvertLightTime(InputLightTime);
         }
 
         // 숫자만 입력되도록 제한
@@ -81,9 +102,17 @@ namespace HerbLight_Advisor
             TextBox textbox = sender as TextBox;
             if (textbox != null)
             {
-                string onlyNum = Regex.Replace(textbox.Text, @"\D", "");
-                textbox.Text = onlyNum;
-
+                if (PpfdText.IsFocused)
+                {
+                    string onlyNum = Regex.Replace(textbox.Text, PPFD_SUFFIX, "");
+                    PpfdText.Text = onlyNum;
+                }
+                else if (LightTimeText.IsFocused)
+                {
+                    string onlyNum = LightTimeText.Text.Replace(HOUR_SUFFIX, "").Replace(MINUTE_SUFFIX, "").Trim();
+                    LightTimeText.Text = onlyNum;
+                }
+                
                 textbox.Dispatcher.BeginInvoke(new Action(() => textbox.SelectAll()), System.Windows.Threading.DispatcherPriority.Input);
             }
         }
@@ -91,33 +120,58 @@ namespace HerbLight_Advisor
         // 포커스를 잃을 때 슬라이더에 값 적용하고 단위 추가
         private void PpfdText_LostFocus(object sender, RoutedEventArgs e)
         {
-            string text = PpfdText.Text.Replace("μmol", "").Trim();
+            string text = PpfdText.Text.Trim();
 
-            if (int.TryParse(text, out int value))
+            if (double.TryParse(text, out double value))
             {
-                value = int.Min(2000, value);
+                value = double.Min(2000, value);
                 PpfdSlider.Value = value;
-                PpfdText.Text = value.ToString() + "μmol";
             }
             else
             {
-                PpfdText.Text = Convert.ToInt32(PpfdSlider.Value).ToString() + "μmol";
+                PpfdText.Text = ConvertPpfd(InputPpfd);
+                Notice1.Text = "";
+                InitBtn.Visibility = Visibility.Collapsed;
+                Notice2.Text = "입력 형식이 잘못되었습니다. (정수.소수)";
             }
         }
 
         private void LightTimeText_LostFocus(object sender, RoutedEventArgs e)
         {
-            string text = LightTimeText.Text.Replace("hour", "").Trim();
+            string text = LightTimeText.Text;
 
-            if (int.TryParse(text, out int value))
+            try
             {
-                value = int.Min(18, value);
+                int hour;
+                int minute;
+
+                if (text.Contains(" "))
+                {
+                    int index = text.IndexOf(" ");
+                    hour = Convert.ToInt32(text.Substring(0, index));
+                    minute = Convert.ToInt32(text.Substring(index + 1));
+                    
+                    if (minute >= 60)
+                    {
+                        throw new Exception();
+                    }
+                }
+                else
+                {
+                    hour = Convert.ToInt32(text);
+                    minute = 0;
+                }
+
+                double value = hour + ((double)minute / 60);
+                value = double.Min(18, value);
                 LightTimeSlider.Value = value;
-                LightTimeText.Text = value.ToString() + "hour";
             }
-            else
+            catch
             {
-                LightTimeText.Text = Convert.ToInt32(LightTimeSlider.Value).ToString() + "hour";
+                LightTimeText.Text = ConvertLightTime(InputLightTime);
+                Notice1.Text = "";
+                InitBtn.Visibility = Visibility.Collapsed;
+                Notice2.Text = "입력 형식이 잘못되었습니다. (시간 분 or 시간)";
             }
         }
 
@@ -129,7 +183,7 @@ namespace HerbLight_Advisor
                 if (PpfdText.IsFocused)
                     LightTimeText.Focus();
                 else if (LightTimeText.IsFocused)
-                    PpfdText.Focus();
+                    ApplyBtn.Focus();
                 
                 e.Handled = true;
             }
@@ -141,14 +195,14 @@ namespace HerbLight_Advisor
             float resultDLI = 0;
             if (HerbList.SelectedIndex == 0)
             {
-                resultDLI = _onnxProcess.PredictAverageDLI((float)InputPpfd, (float)InputTIme);
+                resultDLI = _onnxProcess.PredictAverageDLI((float)InputPpfd, (float)InputLightTime);
             }
             else
             {
-                resultDLI = _onnxProcess.PredictDLI((float)InputPpfd, (float)InputTIme, HerbList.SelectedIndex - 1);
+                resultDLI = _onnxProcess.PredictDLI((float)InputPpfd, (float)InputLightTime, HerbList.SelectedIndex - 1);
             }
             DLISlider.Value = resultDLI;
-            DLIText.Text = resultDLI.ToString() + "%";
+            DLIText.Text = resultDLI.ToString("0.00") + "%";
 
             if (resultDLI > 200)
             {
@@ -203,7 +257,7 @@ namespace HerbLight_Advisor
             DLIText.Foreground = System.Windows.Media.Brushes.Black;
 
             Notice1.Text = "";
-            Notice1.Text = "";
+            Notice2.Text = "";
 
             InitBtn.Visibility = Visibility.Collapsed;
         }
