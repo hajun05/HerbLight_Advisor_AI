@@ -17,7 +17,7 @@ namespace HerbLight_Advisor
 
         public List<string> HerbNames { get; private set; }
 
-        // 입출력 범위 - 역정규화에서 활용
+        // 입출력 범위 - 정규화/역정규화에서 활용
         private float _ppfdMin;
         private float _ppfdMax;
         private float _timeMin;

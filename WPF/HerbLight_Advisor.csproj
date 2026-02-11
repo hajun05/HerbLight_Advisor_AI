@@ -12,6 +12,16 @@
     <None Remove="Resources\Default.png" />
   </ItemGroup>
 
+  <!-- 빌드시 실행파일에 콘텐츠 복사. 실행파일 배포시 같이 포함 -->
+  <ItemGroup>
+  <Content Include="..\AI\HerbLight_Advisor_model.onnx">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </Content>
+  <Content Include="..\AI\scaler_meta_info.json">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </Content>
+</ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.24.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
